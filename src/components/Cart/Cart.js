@@ -7,13 +7,18 @@ import CartItem from "./CartItem";
 const Cart = (props) => {
   const cartCtx = useContext(CartCtx);
 
-  const itemRemoveHandler = (id) => {};
-  const itemAddHandler = (item) => {};
+  const itemRemoveHandler = (id) => {
+    cartCtx.removeItem(id);
+  };
+  const itemAddHandler = (item) => {
+    cartCtx.addItem(item);
+  };
 
   const cartItems = (
     <ul className={styles["cart-items"]}>
       {cartCtx.items.map((item) => (
         <CartItem
+          key={item.id}
           id={item.id}
           name={item.name}
           price={item.price}
