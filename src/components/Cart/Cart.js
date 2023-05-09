@@ -7,6 +7,9 @@ import Checkout from "./Chackout";
 
 const Cart = (props) => {
   const [showCheckout, setShowCheckout] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
   const cartCtx = useContext(CartCtx);
 
   const itemRemoveHandler = (id) => {
@@ -18,6 +21,27 @@ const Cart = (props) => {
 
   const orderHandler = () => {
     setShowCheckout(true);
+  };
+
+  const submitHandler = async (orderInfo) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        "https://food-order-a7544-default-rtdb.firebaseio.com/orders.json",
+        {
+          method: "POST",
+          body: JSON.stringify({ user: orderInfo, items: cartCtx.items }),
+        }
+      );
+      if (!res.ok)
+        throw new Error("Cannot send order, please try again later.");
+
+      cartCtx.clearCart();
+      props.dismissCart();
+    } catch (e) {
+      setError(e.message);
+    }
+    setIsLoading(false);
   };
 
   const cartItems = (
@@ -36,6 +60,20 @@ const Cart = (props) => {
     </ul>
   );
 
+  if (isLoading)
+    return (
+      <Modal>
+        <p>Confirming your order...</p>
+      </Modal>
+    );
+
+  if (error)
+    return (
+      <Modal>
+        <p>{error}</p>
+      </Modal>
+    );
+
   return (
     <Modal closeModal={props.dismissCart}>
       {cartItems}
@@ -43,13 +81,19 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>${cartCtx.totalAmount.toFixed(2)}</span>
       </div>
-      {showCheckout && <Checkout onCancel={props.dismissCart} />}
+      {showCheckout && (
+        <Checkout onCancel={props.dismissCart} onSubmit={submitHandler} />
+      )}
       {!showCheckout && (
         <div className={styles.actions}>
           <button className={styles["button--alt"]} onClick={props.dismissCart}>
             Close
           </button>
-          <button className={styles.button} onClick={orderHandler}>
+          <button
+            className={styles.button}
+            onClick={orderHandler}
+            disabled={cartCtx.items.length === 0}
+          >
             Order
           </button>
         </div>

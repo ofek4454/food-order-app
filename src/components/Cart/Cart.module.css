@@ -50,3 +50,10 @@
   background-color: #8a2b06;
   color: white;
 }
+
+.actions .button:disabled,
+button[disabled] {
+  background-color: #ccc;
+  border-color: transparent;
+  cursor: not-allowed;
+}
