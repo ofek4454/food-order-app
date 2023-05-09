@@ -8,6 +8,7 @@ import Checkout from "./Chackout";
 const Cart = (props) => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const [error, setError] = useState();
 
   const cartCtx = useContext(CartCtx);
@@ -37,7 +38,7 @@ const Cart = (props) => {
         throw new Error("Cannot send order, please try again later.");
 
       cartCtx.clearCart();
-      props.dismissCart();
+      setDone(true);
     } catch (e) {
       setError(e.message);
     }
@@ -60,22 +61,8 @@ const Cart = (props) => {
     </ul>
   );
 
-  if (isLoading)
-    return (
-      <Modal>
-        <p>Confirming your order...</p>
-      </Modal>
-    );
-
-  if (error)
-    return (
-      <Modal>
-        <p>{error}</p>
-      </Modal>
-    );
-
-  return (
-    <Modal closeModal={props.dismissCart}>
+  let content = (
+    <>
       {cartItems}
       <div className={styles.total}>
         <span>Total Amount</span>
@@ -98,8 +85,27 @@ const Cart = (props) => {
           </button>
         </div>
       )}
-    </Modal>
+    </>
   );
+
+  if (isLoading)
+    content = (
+      <div style={{ textAlign: "center" }}>
+        <p>Confirming your order...</p>
+      </div>
+    );
+  if (error) content = <p>{error}</p>;
+  if (done)
+    content = (
+      <div className={styles.actions} style={{ textAlign: "center" }}>
+        <p>order created successfully!</p>
+        <button className={styles.button} onClick={props.dismissCart}>
+          Close
+        </button>
+      </div>
+    );
+
+  return <Modal closeModal={props.dismissCart}>{content}</Modal>;
 };
 
 export default Cart;
