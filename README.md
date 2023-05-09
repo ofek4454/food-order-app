@@ -28,5 +28,6 @@ if the app doesnt start automaticlly try:
 
 ## Video
 
-https://github.com/ofek4454/food-order-app/assets/17598441/03534b92-c37f-4898-84ad-a0dfa823a7d6
+https://github.com/ofek4454/food-order-app/assets/17598441/3356a31c-fc2b-4748-92b0-7e269b7aa2be
+
 
