@@ -1,36 +1,43 @@
+import { useEffect, useState } from "react";
 import Card from "../UI/Card/Card";
 import styles from "./AvailibleMeals.module.css";
 import MealItem from "./MealItem/MealItem";
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
-
 const AvailibleMeals = () => {
-  const mealsList = DUMMY_MEALS.map((meal) => (
+  const [meals, setMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const res = await fetch(
+        "https://food-order-a7544-default-rtdb.firebaseio.com/meals.json"
+      );
+      if (!res.ok) throw new Error("loading failed");
+
+      const data = await res.json();
+
+      if (data === null) throw new Error("loading failed");
+
+      const loadedMeals = [];
+
+      for (const key in data) {
+        loadedMeals.push({
+          id: key,
+          name: data[key].name,
+          description: data[key].description,
+          price: data[key].price,
+        });
+      }
+      setMeals(loadedMeals);
+    };
+
+    setIsLoading(true);
+    fetchMeals().catch((e) => setError(e.message));
+    setIsLoading(false);
+  }, []);
+
+  const mealsList = meals.map((meal) => (
     <MealItem
       key={meal.id}
       id={meal.id}
@@ -40,10 +47,19 @@ const AvailibleMeals = () => {
     />
   ));
 
+  const errorComponent = (
+    <>
+      <p>error occure</p>
+      <p>error: {error}</p>
+    </>
+  );
+
   return (
     <section className={styles.meals}>
       <Card>
-        <ul>{mealsList}</ul>
+        {error !== "" && errorComponent}
+        {isLoading && <p>Loading....</p>}
+        {!isLoading && <ul>{mealsList}</ul>}
       </Card>
     </section>
   );
