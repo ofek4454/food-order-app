@@ -1,5 +1,7 @@
 # Food Order App
 
+## [Try me!](https://food-order-a7544.web.app/)
+
 ## Overview
 
 This app gives you the option to order food.
